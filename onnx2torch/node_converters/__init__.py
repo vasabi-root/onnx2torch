@@ -11,6 +11,7 @@ from onnx2torch.node_converters.constant_of_shape import *
 from onnx2torch.node_converters.conv import *
 from onnx2torch.node_converters.cumsum import *
 from onnx2torch.node_converters.depth_to_space import *
+from onnx2torch.node_converters.dequantize_linear import *
 from onnx2torch.node_converters.dropout import *
 from onnx2torch.node_converters.einsum import *
 from onnx2torch.node_converters.expand import *
@@ -37,6 +38,7 @@ from onnx2torch.node_converters.nms import *
 from onnx2torch.node_converters.nonzero import *
 from onnx2torch.node_converters.pad import *
 from onnx2torch.node_converters.pow import *
+from onnx2torch.node_converters.quantize_linear import *
 from onnx2torch.node_converters.range import *
 from onnx2torch.node_converters.reciprocal import *
 from onnx2torch.node_converters.reduce import *

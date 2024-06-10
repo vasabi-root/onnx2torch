@@ -6,7 +6,7 @@ import warnings
 from typing import Optional
 
 import torch
-from torch import nn
+from torch import nn, Tensor
 
 from onnx2torch.node_converters.registry import add_converter
 from onnx2torch.onnx_graph import OnnxGraph
@@ -84,13 +84,13 @@ class OnnxResize(nn.Module, OnnxToTorchModule):  # pylint: disable=missing-class
                 if scales[:2] != [1, 1]:
                     raise NotImplementedError('Pytorch\'s interpolate cannot scale channel or batch dimensions.')
                 scales = scales[2:]
+                sizes = [round(float(scale)*int(dim)) for scale, dim in zip(scales, input_tensor.shape[2:])]
             else:
                 scales = None
 
         return torch.nn.functional.interpolate(
             input_tensor,
             size=sizes,
-            scale_factor=scales,
             mode=torch_mode,
             align_corners=self.align_corners,
         )
@@ -133,6 +133,7 @@ def _(node: OnnxNode, graph: OnnxGraph) -> OperationConverterResult:  # pylint: 
     nearest_mode = node_attributes.get('nearest_mode', 'round_prefer_floor')
 
     if mode == 'nearest':
+        # mode = 'nearest-exact'
         if nearest_mode != 'floor':
             warnings.warn(
                 'Pytorch\'s nearest neighbor interpolate uses the "floor" nearest_mode. '

@@ -26,11 +26,15 @@ _CONV_CLASS_FROM_SPATIAL_RANK = {
 @add_converter(operation_type='ConvTranspose', version=11)
 def _(node: OnnxNode, graph: OnnxGraph) -> OperationConverterResult:
     weights_value_name = node.input_values[1]
-    weights = graph.initializers[weights_value_name]
+    weights = graph.initializers.get(weights_value_name)
+    if weights is None and 'qinitializers' in dir(graph):
+        weights = graph.qinitializers.get(weights_value_name)
     weights = weights.to_torch()
     if len(node.input_values) == 3:
         bias_value_name = node.input_values[2]
-        bias = graph.initializers[bias_value_name]
+        bias = graph.initializers.get(bias_value_name)
+        if bias is None:
+            bias = graph.qinitializers.get(bias_value_name)
         bias = bias.to_torch()
     else:
         bias = None

@@ -38,6 +38,7 @@ class OnnxGraph:  # pylint: disable=missing-class-docstring
             (name, OnnxNode(node, unique_name=name)) for name, node in zip(unique_names, onnx_graph_proto.node)
         )
         self._initializers = {initializer.name: OnnxTensor(initializer) for initializer in onnx_graph_proto.initializer}
+        self._qinitializers = {}
         self._node_output_values = {
             output_name: (node, i) for node in self._nodes.values() for i, output_name in enumerate(node.output_values)
         }
@@ -74,6 +75,14 @@ class OnnxGraph:  # pylint: disable=missing-class-docstring
     @property
     def initializers(self) -> Mapping[str, OnnxTensor]:  # pylint: disable=missing-function-docstring
         return MappingProxyType(self._initializers)
+    
+    @property
+    def qinitializers(self) -> Mapping[str, OnnxTensor]:  # pylint: disable=missing-function-docstring
+        '''
+        Quantized initializers. 
+        In QDQ format this initializers are DequantizeLinear nodes
+        '''
+        return self._qinitializers
 
     def value_type(self, value_name: str) -> ValueType:  # pylint: disable=missing-function-docstring
         if value_name in self._input_values:

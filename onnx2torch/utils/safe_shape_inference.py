@@ -6,6 +6,7 @@ import onnx
 from onnx.onnx_ml_pb2 import ModelProto
 from onnx.shape_inference import infer_shapes
 from onnx.shape_inference import infer_shapes_path
+import platform
 
 
 def _is_big_model(model: ModelProto) -> bool:
@@ -28,6 +29,8 @@ def safe_shape_inference(  # pylint: disable=missing-function-docstring
     onnx_model_or_path: Union[ModelProto, Path, str],
     **kwargs,
 ) -> ModelProto:
+    if platform.system() == 'Windows' and not isinstance(onnx_model_or_path, ModelProto):
+        onnx_model_or_path = onnx.load(onnx_model_or_path)
     if isinstance(onnx_model_or_path, ModelProto):
         if not _is_big_model(onnx_model_or_path):
             return infer_shapes(onnx_model_or_path, **kwargs)
